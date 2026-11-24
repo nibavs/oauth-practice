@@ -1,3 +1,10 @@
 spring:
   application:
     name: oauth-practice-backend
+
+
+app:
+  OAUTH_GOOGLE_CLIENT_SECRET: ${OAUTH_GOOGLE_CLIENT_SECRET:}
+  OAUTH_GOOGLE_CLIENT_ID: ${OAUTH_GOOGLE_CLIENT_ID:}
+  authorizationCode: "authorization_code"
+  redirectUrl: "http://localhost:3000/auth/google"
