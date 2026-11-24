@@ -49,6 +49,11 @@ export default {
                         return res.json();
                     }
                 )
+                .then(data => {
+                    console.log(data);
+                    this.userName = data.name;
+                    this.picUrl = data.picture;
+                })
         } else {
             this.message = '⚠️ Нет параметра code';
         }

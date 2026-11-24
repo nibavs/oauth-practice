@@ -1,6 +1,5 @@
 package com.nibavs.oauthpracticebackend;
 
-import com.nibavs.oauthpracticebackend.config.AppProperties;
 import com.nibavs.oauthpracticebackend.dtos.JsonCodeRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class OAuthController {
 
-    private final AppProperties appProperties;
     private final OAuthService oAuthService;
 
     @GetMapping("/status")
@@ -31,7 +29,7 @@ public class OAuthController {
     }
 
     @PostMapping("/google/callback")
-    public void handleGoogleCode(@NonNull @RequestBody JsonCodeRequest jsonCodeRequest) {
-        oAuthService.getTokenFromGoogleCode(jsonCodeRequest.code());
+    public ResponseEntity<Object> handleGoogleCode(@NonNull @RequestBody JsonCodeRequest jsonCodeRequest) {
+        return ResponseEntity.ok(oAuthService.getTokenFromGoogleCode(jsonCodeRequest.code()));
     }
 }

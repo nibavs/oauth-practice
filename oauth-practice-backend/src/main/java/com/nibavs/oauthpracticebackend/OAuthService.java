@@ -2,11 +2,14 @@ package com.nibavs.oauthpracticebackend;
 
 import com.nibavs.oauthpracticebackend.config.AppProperties;
 import com.nibavs.oauthpracticebackend.dtos.GoogleRequest;
+import com.nibavs.oauthpracticebackend.dtos.GoogleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import tools.jackson.databind.ObjectMapper;
 
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -39,18 +42,26 @@ public class OAuthService {
     }
 
 
-    public void getTokenFromGoogleCode(String code) {
-        var response = restClient.post()
-                .body(new GoogleRequest(
-                        appProperties.OAUTH_GOOGLE_CLIENT_ID(),
-                        appProperties.OAUTH_GOOGLE_CLIENT_SECRET(),
-                        code,
-                        appProperties.authorizationCode(),
-                        appProperties.redirectUrl()
+    public Object getTokenFromGoogleCode(String code) {
+        GoogleRequest request = new GoogleRequest(
+                appProperties.OAUTH_GOOGLE_CLIENT_ID(),
+                appProperties.OAUTH_GOOGLE_CLIENT_SECRET(),
+                code,
+                appProperties.authorizationCode(),
+                appProperties.redirectUrl()
 
-                ))
+        );
+
+        var response = restClient.post()
+                .body(request)
                 .retrieve()
-                .body(Object.class);
-        System.out.println(response);
+                .body(GoogleResponse.class);
+
+        String[] chunks = response.idToken().split("\\.");
+        byte[] decodedPayload = Base64.getUrlDecoder().decode(chunks[1]);
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readTree(decodedPayload);
     }
+//    {access_token=token, expires_in=time, refresh_token=token, scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile openid, token_type=Bearer, id_token=token, refresh_token_expires_in=604789
 }
